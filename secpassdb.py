@@ -1,54 +1,69 @@
 #!/usr/bin/env python
-
+from multiprocessing import Lock
 import sqlite3, secpass
 #from pycloak.shellutils import file_exists
 from os.path import exists as rile_exists
 #from . import secpass
 
+lock = Lock()
 #TODO: serialize username and password
 
 class PasswordDb:
-   def __init__(self, db_path = 'passwords.db', create_new = False):
+   def __init__(self, db_path = 'passwords.db', create_new = False, get_next_id=None,
+                min_uname=6, min_pass=8):
       self.conn = sqlite3.connect(db_path)
       self.c = self.conn.cursor()
+      if get_next_id is None:
+         get_next_id = lambda: 0
+      self.get_next_id = get_next_id
+
+      self.min_uname = min_uname #if None, then don't check
+      self.min_pass = min_pass #if passed None, then don't check
 
       if create_new:
          self.init_empty_db()
 
    def init_empty_db(self):
       self.c.execute('''CREATE TABLE userdata
-                        (username text, pass_hash text)''')
+                        (objid number, username text, pass_hash text)''')
       self.conn.commit()
 
    def check_if_user_exists(self, uname):
-      self.c.execute("SELECT username FROM userdata WHERE username = '%s'" % uname)
+      self.c.execute("SELECT username FROM userdata WHERE username = ?", (uname, ))
       if self.c.fetchone() != None:
          return True
       return False
 
    def get_user_hash(self, uname):
-      self.c.execute("SELECT pass_hash FROM userdata WHERE username = '%s'" % uname)
+      self.c.execute("SELECT pass_hash FROM userdata WHERE username = ?" % (uname, ))
       return self.c.fetchone()
 
    #0 = success, 1 = username taken, 2 = bad username, 3 = bad password
    #TODO: this is outdated:::: , 4 = SecurePass error
    def db_add_user(self, username, password):
-      if self.check_if_user_exists(username):
-         return 1
-      if len(username) < 6:
+      if self.min_uname is not None and len(username) < self.min_uname:
          return 2
-      if len(password) < 8:
+      if self.min_pass is not None and len(password) < self.min_pass:
          return 3
 
+      lock.acquire()
+      does_exist = self.check_if_user_exists(username):
+      if does_exist:
+         lock.release()
+         return 1
+
+      nextId = self.get_next_id()
       pass_hash = secpass.gen_pass_hash(password)
       #sp = secpass.SecurePassword()
       #new_user = sp.set_pass(password)
       #if new_user is None:
       #   return 4
       #(phash, salt, prepend) = new_user
-      cmd = 'INSERT INTO userdata VALUES ("%s", "%s")' % (username, pass_hash.replace('"', '""'))
-      self.c.execute(cmd)
+      args = (nextId, username, pass_hash.replace('"', '""'))
+      cmd = 'INSERT INTO userdata VALUES (?, ?)'
+      self.c.execute(cmd, args)
       self.conn.commit()
+      lock.release()
       return 0
 
    #0 = good password, 1 = username doesn't exist

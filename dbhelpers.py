@@ -2,6 +2,7 @@
 import os.path, sqlite3
 from atomicid import ObjId
 from dbdict import DbDict
+from secpass import PasswordDb
 
 def log(msg):
    print(msg)
@@ -24,6 +25,7 @@ class Db(object):
 
       self.tables_need_exist['obj_ids'] = self._init_obj_ids
       self.tables_need_exist['str_str'] = self._init_db_dict
+      self.tables_need_exist['userdata'] = self._init_userdata
       self.init_tables()
 
    def check_if_table_exists(self, tableName):
@@ -55,11 +57,21 @@ class Db(object):
    def _init_db_dict(self):
       self.dbdict = Dbdict(self.dbpath)
       self.dbdict.init_db()
+   def _init_userdata(self):
+      self.accounts = PasswordDb(self.dbpath, True, self.get_obj_id)
 
+   ###
    def get_obj_id(self):
       self.objids.get_id()
+
    def dset(self, key, val):
       self.dbdict.set(key, val)
    def dget(self, key, val):
       return self.dbdict.get(key)
+
+   def add_account(self, uname, passw):
+      return self.accounts.db_add_user(uname, passw)
+   def check_account_match(self, uname, passw):
+      return self.accounts.db_check_user(name, passw)
+
 
