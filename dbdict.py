@@ -36,7 +36,9 @@ class DbDict:
 
    def get(self, key): #maybe pass defaultval
       self.c.execute('SELECT val FROM str_str WHERE key = ?', (key, ))
-      return self.c.fetchone()[0]
-
-
+      ret = self.c.fetchone()[0]
+      if ret is None:
+         return ret
+      else
+         return ret[0]
 

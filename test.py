@@ -1,6 +1,5 @@
-import sqlite3
+import sqlite3, atomicid, os.path
 from flask import Flask, request, send_from_directory
-import os.path
 
 app = Flask(__name__)
 
@@ -43,7 +42,9 @@ def on_req():
    return 'ok'
 
 
-
+l =
+def test_objid():
+   for i in urange(0, 1000):
 
 
 
