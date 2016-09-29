@@ -1,6 +1,7 @@
 #from events import Event
 import os.path, sqlite3
 from atomicid import ObjId
+from dbdict import DbDict
 
 def log(msg):
    print(msg)
@@ -22,6 +23,7 @@ class Db(object):
       self.c = self.conn.cursor()
 
       self.tables_need_exist['obj_ids'] = self._init_obj_ids
+      self.tables_need_exist['str_str'] = self._init_db_dict
       self.init_tables()
 
    def check_if_table_exists(self, tableName):
@@ -47,10 +49,17 @@ class Db(object):
             init_func = self.tables_need_exist[name]
             init_func()
 
-   def get_id(self):
-      self.objids.get_id()
-
    def _init_obj_ids(self):
       self.objids = ObjId(self.dbpath)
       self.objids.init_db()
+   def _init_db_dict(self):
+      self.dbdict = Dbdict(self.dbpath)
+      self.dbdict.init_db()
+
+   def get_obj_id(self):
+      self.objids.get_id()
+   def dset(self, key, val):
+      self.dbdict.set(key, val)
+   def dget(self, key, val):
+      return self.dbdict.get(key)
 
