@@ -1,0 +1,3 @@
+curl -F "name=sdg" http://127.0.0.1:8000
+gunicorn test:app -b 0.0.0.0:8001 #public ip
+gunicorn test:app -b 127.0.0.1:8000 #private ip
