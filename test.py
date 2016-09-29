@@ -42,7 +42,7 @@ def on_req():
    return 'ok'
 
 
-l =
+#l =
 def test_objid():
    for i in urange(0, 1000):
 
