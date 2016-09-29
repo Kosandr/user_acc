@@ -26,6 +26,31 @@ class UserPermissions(Db):
    def rm_user_from_group(groupname):
       pass
 
+   ###new
+
+   #resource access rights
+   def perm_add_resource(res_name, groups, users):
+
+   #def perm_modify_resource_rights(res_name):
+   def perm_resource_add_group(name, group_name):
+      pass
+   def perm_resource_rm_group(name, group_name):
+      pass
+   def perm_resource_add_user(name, uname):
+      pass
+   def perm_resource_rm_user(name, uname):
+      pass
+
+   #decorator. Passes arg "allowed"
+   def perm_resource_name(name):
+      pass
+
+   #decorator
+   def requires_group(name):
+      pass
+
+   ###old
+
    #this specific itemname can be accessed by this groups
    def add_granual_item(itemname, group_access_list):
       pass
@@ -44,6 +69,29 @@ class UserPermissions(Db):
    #decorator for each resource, can give it name and it will be managed by granual_item
    def resource_perm(resourcename):
       pass
+
+
+'''
+add_group('viewer')
+add_group('modifier')
+add_group('privaleged_viewer')
+add_group('privaleged_modifier')
+add_group('admin')
+
+@requires_group('admin')
+def approve_user(uname):
+   pass
+
+@requires_group('admin')
+def add_user_to_group(uname, grp):
+   pass
+
+def get_report(reportname):
+   pass
+
+def view_report():
+   pass
+'''
 
 n = 0
 class FormDb:
