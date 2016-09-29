@@ -73,7 +73,8 @@ class PasswordDb:
       user_exists = self.check_if_user_exists(username_check)
       if not user_exists:
          return 1
-      self.c.execute("SELECT * FROM userdata WHERE username = '%s'" % username_check)
+
+      self.c.execute("SELECT * FROM userdata WHERE username = ?", (username_check, ))
       user = self.c.fetchone()
       if user is None:
          return 4
