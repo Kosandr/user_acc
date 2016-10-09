@@ -5,7 +5,7 @@ import dbhelpers
 app = Flask(__name__)
 DB_PATH = '/tmp/permtest.db'
 
-######################
+######################Perm
 #perms are asrw, a being (a)dministrator privelages (can give out read/write), and s is (s)uper admin which can give out admin and superadmin
 #perms = Perm([Perm.ADMIN, Perm.SUPER, Perm.READ, Perm.WRITE])
 
@@ -22,7 +22,6 @@ DB_PATH = '/tmp/permtest.db'
 #x.has_read(), x.has_write(), x.has_admin(), x.has_super_admin()
 
 ######################
-
 class Perm(object):
    ADMIN = (1 << 0)
    SUPER = (1 << 1)
@@ -128,39 +127,47 @@ x = Perm('asrw')
 x = Perm(Perm.ADMIN)
 y = Perm(x)
 
+#users and groups need to be unique
 class UserPermissions(dbhelpers.Db):
    #TODO: can make more generic, and each permission is a Tag
    def _init_perm_table(self):
       self.c.execute('''CREATE TABLE perm_groups (objid integer, name text)''')
       self.c.execute('''CREATE TABLE perm_users (objid integer, name text)''')
-      self.c.execute('''CREATE TABLE perm_group_members (objid integer, group_id integer, user_id integer)''')
+      self.c.execute('CREATE TABLE perm_group_members (objid integer, group_id integer, user_id integer)')
 
       self.c.execute('''CREATE TABLE perm_resources (objid integer, name text)''')
+
       #group with id group_id has permissions to resource with id resource_id. Perm described in beginning
-      self.c.execute('''CREATE TABLE perm_resource_allowed_groups (resource_id integer, group_id integer, perms text)''')
+      self.c.execute('''CREATE TABLE perm_resource_allowed_groups
+                                     (resource_id integer, group_id integer, perms text)''')
 
-   def __init__(self, dbpath):
-      super(UserPermissions, self).__init__(dbpath)
-      self.tables_need_exist['perm'] = self._init_perm_table
-      self.init_tables()
+-   def __init__(self, dbpath):
+-      super(UserPermissions, self).__init__(dbpath)
+-      self.tables_need_exist['perm'] = self._init_perm_table
+-      self.init_tables()
 
++      #group with id group_id has permissions to resource with id resource_id. Perm described in beginning
++      self.c.execute('''CREATE TABLE perm_resource_allowed_groups
++                                     (resource_id integer, group_id integer, perms text)''')
 
-   def _get_gid(self, gname):
-      self.c.execute('SELECT objid FROM perm_groups WHERE name = ?', (gname, ))
-      gid = self.c.fetchone()
-      if gid is None:
-         return None
-      return gid[0]
+-   def _get_gid(self, gname):
+-      self.c.execute('SELECT objid FROM perm_groups WHERE name = ?', (gname, ))
+-      gid = self.c.fetchone()
+-      if gid is None:
+-         return None
+-      return gid[0]
 
-   def _get_uid(self, uname):
-      self.c.execute('SELECT objid FROM perm_users WHERE name = ?', (uname, ))
-      uid = self.c.fetchone()
-      if uid is None:
-         return None
-      return uid[0]
+-   def _get_uid(self, uname):
+-      self.c.execute('SELECT objid FROM perm_users WHERE name = ?', (uname, ))
+-      uid = self.c.fetchone()
+-      if uid is None:
+-         return None
+-      return uid[0]
+
+   def __init__(self, dbpath): super(UserPermissions, self).__init__(dbpath) self.tables_need_exist['perm'] = self._init_perm_table self.init_tables() def _get_gid(self, gname): self.c.execute('SELECT objid FROM perm_groups WHERE name = ?', (gname, )) gid = self.c.fetchone() if gid is None: return None return gid[0] def _get_uid(self, uname): self.c.execute('SELECT objid FROM perm_users WHERE name = ?', (uname, )) uid = self.c.fetchone() if uid is None: return None return uid[0]
 
    #1 = success, 2 = failure already exists, 3 = failure bad name (short)
-   def add_user(self, uname):
+   def new_user(self, uname):
       if len(uname) < 5:
          return 3
       if self._get_uid(uname) is not None:
@@ -182,7 +189,7 @@ class UserPermissions(dbhelpers.Db):
       return 1
 
    #1 = success, 2 = already exists
-   def add_group(self, groupname):
+   def new_group(self, groupname):
       if self._get_gid(groupname) is not None:
          return 2
       self.c.execute('INSERT INTO perm_groups VALUES (?, ?)', (self.get_id(), groupname))
@@ -256,23 +263,26 @@ class UserPermissions(dbhelpers.Db):
    #2 = resource already exists
    #3 = one of groups doesn't exist
    #declare resource, and its access rights
-   def perm_add_resource(self, res_name, groups=[]):
+   def perm_new_resource(self, res_name): #, groups=[]):
       rid = self._get_rid(res_name)
       if rid is not None:
          return 2
       rid = self.get_id()
       self.c.execute('INSERT INTO perm_resources VALUES (?, ?)', (rid, res_name))
 
-      for group in groups:
-         ret = self.perm_resource_add_group(group)
-         if ret != 1:
-            return ret
+      #for group in groups:
+      #   ret = self.perm_resource_add_group(group)
+      #   if ret != 1:
+      #      return ret
       return 1
 
-   #1 = success
+   #1 = success, 2 = res_name resource doesn't exist,
    #def perm_modify_resource_rights(res_name):
-   def perm_resource_add_group(res_name, group_name):
+   def perm_resource_add_group(res_name, group_name, perms):
       #rid = self._get_rid(rid,) #kkyy
+      rid = self._get_rid(res_name)
+      if rid is None:
+         return 2
       pass
    def perm_resource_rm_group(res_name, group_name):
       pass
@@ -287,7 +297,7 @@ class UserPermissions(dbhelpers.Db):
       pass
 
 
-   ###older ew
+   ###older new
 
    #resource access rights
    def perm_add_resource(res_name, groups, users):
