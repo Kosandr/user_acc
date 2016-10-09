@@ -12,19 +12,20 @@ class Db(object):
    #dictionary of table names and their initialization code
    tables_need_exist = dict() #{ 'obj_ids', _init_obj_ids }
 
-
    def __init__(self, dbpath):
       self.dbpath = dbpath
 
-      self.need_init_all = False
-      if not os.path.exists(dbpath):
-         self.need_init_all = True
-         log('need to initialize all tables')
+      #self.need_init_all = False
+      #if not os.path.exists(dbpath):
+      #   self.need_init_all = True
+      #   log('need to initialize all tables')
 
       self.conn = sqlite3.connect(dbpath)
       self.c = self.conn.cursor()
 
-      self.tables_need_exist['obj_ids'] = self._init_obj_ids
+      #self.tables_need_exist['obj_ids'] = self._init_obj_ids
+      self.objids = ObjId(self.dbpath)
+
       self.tables_need_exist['str_str'] = self._init_db_dict
       self.tables_need_exist['userdata'] = self._init_userdata
       self.init_tables()
@@ -43,27 +44,28 @@ class Db(object):
    def init_tables(self):
       for name in self.tables_need_exist:
          need_init = False
-         if self.need_init_all:
-            need_init = True
-         elif not self.check_if_table_exists(name):
+         #if self.need_init_all:
+         #   need_init = True
+         #elif not self.check_if_table_exists(name):
+         if not self.check_if_table_exists(name):
             need_init = True
          if need_init:
             log('creating and initing table %s' % name)
             init_func = self.tables_need_exist[name]
             init_func()
 
-   def _init_obj_ids(self):
-      self.objids = ObjId(self.dbpath)
-      self.objids.init_db()
+   #def _init_obj_ids(self):
+   #   self.objids = ObjId(self.dbpath)
+   #   self.objids.init_db()
    def _init_db_dict(self):
-      self.dbdict = Dbdict(self.dbpath)
+      self.dbdict = DbDict(self.dbpath)
       self.dbdict.init_db()
    def _init_userdata(self):
       self.accounts = PasswordDb(self.dbpath, True, self.get_obj_id)
 
    ###
    def get_obj_id(self):
-      self.objids.get_id()
+      return self.objids.get_id()
 
    def dset(self, key, val):
       self.dbdict.set(key, val)

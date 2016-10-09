@@ -122,15 +122,21 @@ class Perm(object):
    def has_super_admin(self):
       return (self.val & Perm.SUPER) is not 0
 
+'''
 x = Perm([Perm.ADMIN, Perm.SUPER])
 x = Perm('asrw')
 x = Perm(Perm.ADMIN)
 y = Perm(x)
+'''
 
 #users and groups need to be unique
 class UserPermissions(dbhelpers.Db):
    #TODO: can make more generic, and each permission is a Tag
    def _init_perm_table(self):
+      #TODO: remove this logic
+      #if self.check_if_table_exists('perm_groups'):
+      #   return
+
       self.c.execute('''CREATE TABLE perm_groups (objid integer, name text)''')
       self.c.execute('''CREATE TABLE perm_users (objid integer, name text)''')
       self.c.execute('CREATE TABLE perm_group_members (objid integer, group_id integer, user_id integer)')
@@ -142,9 +148,11 @@ class UserPermissions(dbhelpers.Db):
                                      (perm_id integer, resource_id integer, group_id integer, perms integer)''')
 
    def __init__(self, dbpath):
+      #tname = 'perm'
+      tname = 'perm_groups'
+      self.tables_need_exist[tname] = self._init_perm_table
       super(UserPermissions, self).__init__(dbpath)
-      self.tables_need_exist['perm'] = self._init_perm_table
-      self.init_tables()
+      #self.init_tables()
 
    def _get_gid(self, gname):
       self.c.execute('SELECT objid FROM perm_groups WHERE name = ?', (gname, ))
@@ -160,13 +168,13 @@ class UserPermissions(dbhelpers.Db):
          return None
       return uid[0]
 
-   #1 = success, 2 = failure already exists, 3 = failure bad name (short)
+   #1 = success, 2 = failure already exists, 3 = failure bad name (short at least 4 chars)
    def new_user(self, uname):
-      if len(uname) < 5:
+      if len(uname) < 4:
          return 3
       if self._get_uid(uname) is not None:
          return 2
-      self.c.execute('INSERT INTO perm_users VALUES (?, ?)', (self.get_id(), uname))
+      self.c.execute('INSERT INTO perm_users VALUES (?, ?)', (self.get_obj_id(), uname))
       self.conn.commit()
       return 1
 
@@ -186,7 +194,7 @@ class UserPermissions(dbhelpers.Db):
    def new_group(self, groupname):
       if self._get_gid(groupname) is not None:
          return 2
-      self.c.execute('INSERT INTO perm_groups VALUES (?, ?)', (self.get_id(), groupname))
+      self.c.execute('INSERT INTO perm_groups VALUES (?, ?)', (self.get_obj_id(), groupname))
       self.conn.commit()
       return 1
 
@@ -217,7 +225,7 @@ class UserPermissions(dbhelpers.Db):
       if objId is not None:
          return 4
 
-      self.c.execute('INSERT INTO perm_group_members VALUES (?, ?, ?)', (self.get_id(), gId, uId))
+      self.c.execute('INSERT INTO perm_group_members VALUES (?, ?, ?)', (self.get_obj_id(), gId, uId))
       self.conn.commit()
       return 1
 
@@ -259,7 +267,7 @@ class UserPermissions(dbhelpers.Db):
       rid = self._get_rid(res_name)
       if rid is not None:
          return 2
-      rid = self.get_id()
+      rid = self.get_obj_id()
       self.c.execute('INSERT INTO perm_resources VALUES (?, ?)', (rid, res_name))
 
       #for group in groups:
@@ -281,7 +289,7 @@ class UserPermissions(dbhelpers.Db):
       real_perm = Perm(perms)
       if real_perm.get_status() != 0:
          return (4, 'bad_perm', real_perm.get_status())
-      pid = self.get_id() #permission id
+      pid = self.get_obj_id() #permission id
       self.c.execute('INSERT INTO perm_resource_allowed_groups (?, ?, ?, ?)', (pid, rid, gid, real_perm.val))
       return 1
 
@@ -295,60 +303,9 @@ class UserPermissions(dbhelpers.Db):
       pass
 
 
-   ###older new
-
-   #TODO: optional decorator
-   #decorator
-   def requires_group(name):
-      pass
-
-   #resource access rights
-   def perm_add_resource(res_name, groups, users):
-      pass
-
-   #def perm_modify_resource_rights(res_name):
-   def perm_resource_add_group(name, group_name):
-      pass
-   def perm_resource_rm_group(name, group_name):
-      pass
-   def perm_resource_add_user(name, uname):
-      pass
-   def perm_resource_rm_user(name, uname):
-      pass
-
-   #decorator. Passes arg "allowed"
-   def perm_resource_name(name):
-      pass
-
-   #TODO: optional
-   #decorator
-   def requires_group(name):
-      pass
-
-   ###old
-
-   #this specific itemname can be accessed by this groups
-   def add_granual_item(itemname, group_access_list):
-      pass
-
-   def check_user_check_granual_resource(itemname, uname):
-      pass
-
-   #possibly decorator
-   def check_group(group_access):
-      pass
-
-   #same as above
-   def requires_group(groups):
-      pass
-
-   #decorator for each resource, can give it name and it will be managed by granual_item
-   def resource_perm(resourcename):
-      pass
-
-
-'''
-p = new UserPermissions('/sec/db/user.db')
+'''UserPermissions example
+from perm import UserPermissions
+p = UserPermissions('/sec/db/dbtnext/usertest.db')
 
 p.new_group('viewer')
 p.new_group('writer')
