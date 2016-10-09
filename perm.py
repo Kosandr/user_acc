@@ -139,32 +139,26 @@ class UserPermissions(dbhelpers.Db):
 
       #group with id group_id has permissions to resource with id resource_id. Perm described in beginning
       self.c.execute('''CREATE TABLE perm_resource_allowed_groups
-                                     (resource_id integer, group_id integer, perms text)''')
+                                     (perm_id integer, resource_id integer, group_id integer, perms integer)''')
 
--   def __init__(self, dbpath):
--      super(UserPermissions, self).__init__(dbpath)
--      self.tables_need_exist['perm'] = self._init_perm_table
--      self.init_tables()
+   def __init__(self, dbpath):
+      super(UserPermissions, self).__init__(dbpath)
+      self.tables_need_exist['perm'] = self._init_perm_table
+      self.init_tables()
 
-+      #group with id group_id has permissions to resource with id resource_id. Perm described in beginning
-+      self.c.execute('''CREATE TABLE perm_resource_allowed_groups
-+                                     (resource_id integer, group_id integer, perms text)''')
+   def _get_gid(self, gname):
+      self.c.execute('SELECT objid FROM perm_groups WHERE name = ?', (gname, ))
+      gid = self.c.fetchone()
+      if gid is None:
+         return None
+      return gid[0]
 
--   def _get_gid(self, gname):
--      self.c.execute('SELECT objid FROM perm_groups WHERE name = ?', (gname, ))
--      gid = self.c.fetchone()
--      if gid is None:
--         return None
--      return gid[0]
-
--   def _get_uid(self, uname):
--      self.c.execute('SELECT objid FROM perm_users WHERE name = ?', (uname, ))
--      uid = self.c.fetchone()
--      if uid is None:
--         return None
--      return uid[0]
-
-   def __init__(self, dbpath): super(UserPermissions, self).__init__(dbpath) self.tables_need_exist['perm'] = self._init_perm_table self.init_tables() def _get_gid(self, gname): self.c.execute('SELECT objid FROM perm_groups WHERE name = ?', (gname, )) gid = self.c.fetchone() if gid is None: return None return gid[0] def _get_uid(self, uname): self.c.execute('SELECT objid FROM perm_users WHERE name = ?', (uname, )) uid = self.c.fetchone() if uid is None: return None return uid[0]
+   def _get_uid(self, uname):
+      self.c.execute('SELECT objid FROM perm_users WHERE name = ?', (uname, ))
+      uid = self.c.fetchone()
+      if uid is None:
+         return None
+      return uid[0]
 
    #1 = success, 2 = failure already exists, 3 = failure bad name (short)
    def new_user(self, uname):
@@ -249,7 +243,6 @@ class UserPermissions(dbhelpers.Db):
       self.c.execute('DELETE FROM perm_group_members WHERE objid = ?',  (objId, ))
       return 1
 
-
    def _get_rid(self, res_name):
       self.c.execute('SELECT objid FROM perm_resources WHERE name = ?', (res_name, ))
       rid = self.c.fetchone()
@@ -257,13 +250,12 @@ class UserPermissions(dbhelpers.Db):
          return None
       return rid[0]
 
-   ###newer new
-
+   #new_resource(res_name)
    #1 = success
    #2 = resource already exists
    #3 = one of groups doesn't exist
    #declare resource, and its access rights
-   def perm_new_resource(self, res_name): #, groups=[]):
+   def new_resource(self, res_name): #, groups=[]):
       rid = self._get_rid(res_name)
       if rid is not None:
          return 2
@@ -276,28 +268,39 @@ class UserPermissions(dbhelpers.Db):
       #      return ret
       return 1
 
-   #1 = success, 2 = res_name resource doesn't exist,
-   #def perm_modify_resource_rights(res_name):
-   def perm_resource_add_group(res_name, group_name, perms):
+   #1 = success, 2 = res_name resource doesn't exist, 3 = group_name doesn't exist
+   #4 = (4, 'bad_perm', perm_init_status) #whenever perms passed are invalid
+   def resource_add_group(self, res_name, group_name, perms):
       #rid = self._get_rid(rid,) #kkyy
       rid = self._get_rid(res_name)
       if rid is None:
          return 2
+      gid = self._get_gid(group_name)
+      if gid is None:
+         return 3
+      real_perm = Perm(perms)
+      if real_perm.get_status() != 0:
+         return (4, 'bad_perm', real_perm.get_status())
+      pid = self.get_id() #permission id
+      self.c.execute('INSERT INTO perm_resource_allowed_groups (?, ?, ?, ?)', (pid, rid, gid, real_perm.val))
+      return 1
+
+   def resource_rm_group(self, perm_id): #(res_name, group_name):
       pass
-   def perm_resource_rm_group(res_name, group_name):
+   def modify_resource_rights(res_name):
       pass
 
    #decorator. Passes arg "allowed"
-   def perm_resource_name(name):
-      pass
-
-   #TODO: optional
-   #decorator
-   def requires_group(name):
+   def resource_name(name):
       pass
 
 
    ###older new
+
+   #TODO: optional decorator
+   #decorator
+   def requires_group(name):
+      pass
 
    #resource access rights
    def perm_add_resource(res_name, groups, users):
@@ -345,25 +348,42 @@ class UserPermissions(dbhelpers.Db):
 
 
 '''
-add_group('viewer')
-add_group('modifier')
-add_group('privaleged_viewer')
-add_group('privaleged_modifier')
-add_group('admin')
+p = new UserPermissions('/sec/db/user.db')
 
-@requires_group('admin')
+p.new_group('viewer')
+p.new_group('writer')
+p.new_group('privaleged_viewer')
+p.new_group('privaleged_modifier')
+p.new_group('admin')
+
+#main user
+p.new_user('root')
+p.new_group('root')
+p.add_user_to_group('root', 'root')
+p.add_user_to_group('admin', 'root')
+
+#approve section
+p.new_resource('approve_section')
+p.resource_add_group('approve_section', 'root')
+p.resource_add_group('approve_section', 'admin')
+
+
+#@requires_group('admin')
+@p.resource_name('approve_section')
 def approve_user(uname):
    pass
 
-@requires_group('admin')
+#@requires_group('admin')
+@p.resource_name('modify_user_group')
 def add_user_to_group(uname, grp):
    pass
 
+@p.resource_name('report')
 def get_report(reportname):
    pass
 
-def view_report():
-   pass
+#def view_report():
+#   pass
 '''
 
 n = 0
