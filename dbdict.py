@@ -39,6 +39,6 @@ class DbDict:
       ret = self.c.fetchone()[0]
       if ret is None:
          return ret
-      else
+      else:
          return ret[0]
 

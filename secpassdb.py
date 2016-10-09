@@ -47,7 +47,7 @@ class PasswordDb:
          return 3
 
       lock.acquire()
-      does_exist = self.check_if_user_exists(username):
+      does_exist = self.check_if_user_exists(username)
       if does_exist:
          lock.release()
          return 1
@@ -145,4 +145,6 @@ if __name__ == '__main__':
    pdb = PasswordDb(loc, create_new=create_new)
 
    #test_concurr()
-test_db(pdb)
+   test_db(pdb)
+
+

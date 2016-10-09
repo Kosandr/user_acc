@@ -2,7 +2,8 @@
 import os.path, sqlite3
 from atomicid import ObjId
 from dbdict import DbDict
-from secpass import PasswordDb
+#from secpass import PasswordDb
+from secpassdb import PasswordDb
 
 def log(msg):
    print(msg)
