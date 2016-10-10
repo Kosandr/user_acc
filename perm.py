@@ -168,8 +168,7 @@ class UserPermissions(dbhelpers.Db):
          return 3
       if self._get_uid(uname) is not None:
          return 2
-      oid = self.get_obj_id(False)
-      self.c.execute('INSERT INTO perm_users VALUES (?, ?)', (oid, uname))
+      self.c.execute('INSERT INTO perm_users VALUES (?, ?)', (self.get_obj_id(), uname))
       self.conn.commit()
       return 1
 

@@ -70,7 +70,7 @@ class PasswordDb:
       #(phash, salt, prepend) = new_user
       #kkkkkkkkk might need this
       #kkkkkkkkk lock.release()
-      args = (nextId, username, pass_hash.replace('"', '""'))
+      args = (nextId, username, pass_hash) #pass_hash.replace('"', '""'))
       cmd = 'INSERT INTO userdata VALUES (?, ?, ?)'
       self.c.execute(cmd, args)
       self.conn.commit()
@@ -91,7 +91,8 @@ class PasswordDb:
          return 4
 
       #(uname, phash, salt, prepend) = user
-      (uname, phash) = user
+      (uid, uname, phash) = user
+
       if username_check != uname:
          return 2
 

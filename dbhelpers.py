@@ -87,6 +87,6 @@ class Db(object):
    #2 = username doesn't match, 3 = password doesn't match
    # 4 = other error
    def check_account_match(self, uname, passw):
-      return self.accounts.db_check_user(name, passw)
+      return self.accounts.db_check_user(uname, passw)
 
 
