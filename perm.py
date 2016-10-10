@@ -259,7 +259,8 @@ class UserPermissions(dbhelpers.Db):
       return ret[0]
 
    #get_user_groups(uname)
-   #1 = success
+   #(wrong) 1 = success
+   #list = success
    #2 = user doesn't exist
    #3 = get_user_group_ids returned bad type
    #4 = couldn't get name of one of the group_id's
@@ -279,7 +280,8 @@ class UserPermissions(dbhelpers.Db):
       return ret
 
    #get_user_group_ids()
-   #1 = success
+   #list = success
+   #(wrong) 1 = success
    #2 = user doesn't exist
    def get_user_group_ids(self, uname):
       uId = self._get_uid(uname)
@@ -404,6 +406,22 @@ class UserPermissions(dbhelpers.Db):
          if perms.get_status() != 0:
             return (4, 'bad_perm', perms.get_status())
          return perms
+
+   #get_resource_user_perms()
+   #2 = res_name doesn't exist
+   #3 = user doesn't exist
+   #4 = (4, 'groups_fail', groups_ret_status) = get_user_groups() failed
+   def get_resource_user_perms(self, res_name, uname):
+      rid = self._get_rid(res_name)
+      if rid is None:
+         return 2
+      uid = self._get_uid(uname)
+      if uid is None:
+         return 3
+
+      groups = self.get_user_groups(uname)
+      if type(groups) is not list:
+         return (4, 'group_fail', groups)
 
    #def modify_resource_rights(res_name):
    #   pass

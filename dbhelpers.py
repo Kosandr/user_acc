@@ -24,7 +24,8 @@ class Db(object):
       self.c = self.conn.cursor()
 
       accounts_exist = self.check_if_table_exists('userdata')
-      self.accounts = PasswordDb(self.dbpath, not accounts_exist, self.get_obj_id)
+      #self.accounts = PasswordDb(self.dbpath, not accounts_exist, self.get_obj_id)
+      self.accounts = PasswordDb(self.conn, not accounts_exist, self.get_obj_id)
 
       if self.check_if_table_exists('obj_ids') is False:
          self.objids = ObjId(self.conn,  True)
