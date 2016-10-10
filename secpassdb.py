@@ -54,7 +54,8 @@ class PasswordDb:
       if self.min_pass is not None and len(password) < self.min_pass:
          return 3
 
-      lock.acquire()
+      #kkkkkkk might needs this
+      #kkkkkkk lock.acquire()
       does_exist = self.check_if_user_exists(username)
       if does_exist:
          lock.release()
@@ -67,7 +68,8 @@ class PasswordDb:
       #if new_user is None:
       #   return 4
       #(phash, salt, prepend) = new_user
-      lock.release()
+      #kkkkkkkkk might need this
+      #kkkkkkkkk lock.release()
       args = (nextId, username, pass_hash.replace('"', '""'))
       cmd = 'INSERT INTO userdata VALUES (?, ?, ?)'
       self.c.execute(cmd, args)
