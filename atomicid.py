@@ -6,10 +6,10 @@ lock = Lock()
 class ObjId:
    def __init__(self, dbpath_or_conn, need_init = False):
       if type(dbpath_or_conn) is str:
-         if not os.path.exists(dbpath):
+         if not os.path.exists(dbpath_or_conn):
             need_init = True
 
-         self.conn = sqlite3.connect(dbpath)
+         self.conn = sqlite3.connect(dbpath_or_conn)
       else:
          self.conn = dbpath_or_conn
 

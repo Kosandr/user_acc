@@ -1,5 +1,6 @@
 from .perm import Perm
 from .perm import UserPermissions
+from . import atomicid
 
 '''Perm example
 x = Perm([Perm.ADMIN, Perm.SUPER])
