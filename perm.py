@@ -171,6 +171,11 @@ class UserPermissions(dbhelpers.Db):
       self.conn.commit()
       return 1
 
+   def user_exists(self, uname):
+      if self._get_uid(uname) is not None:
+         return True
+      return False
+
    #1 = sucess, 2 = user never existed, (possibly 3 = user is admin)
    def rm_user(self, uname):
       self.c.execute('SELECT objid FROM perm_users WHERE name = ?', (uname, ))
@@ -200,6 +205,7 @@ class UserPermissions(dbhelpers.Db):
       self.conn.commit()
       return 1
 
+   #add_user_to_grop(self, groupname, uname)
    #1 = success
    #2 = group doesn't exist
    #3 = user doesn't exist
@@ -282,6 +288,7 @@ class UserPermissions(dbhelpers.Db):
       #      return ret
       return 1
 
+   #resource_group_add_perms(self, res_name, group_name, perms, remove_old)
    #1 = success
    #2 = res_name resource doesn't exist, 3 = group_name doesn't exist
    #4 = (4, 'bad_perm', perm_init_status) #whenever perms passed are invalid
@@ -322,13 +329,14 @@ class UserPermissions(dbhelpers.Db):
       self.conn.commit()
       return 1
 
-      #self.c.execute('SELECT perms FROM perm_resource_allowed_groups WHERE')
+   #self.c.execute('SELECT perms FROM perm_resource_allowed_groups WHERE')
    def resource_group_rm_perms(self, perm_id, perms): #(res_name, group_name):
       pass
 
    def resource_group_drop_all_perms(self, perm_id): #resource_group_rm_all_perms()
       pass
 
+   #get_resource_group_perms(self, res_name, group_name)
    #1 = success, 2 = res_name doesn't exist, 3 = group_name doesn't exist
    #4 = (4, 'bad_perm', perm_init_status)
    #5 = record for this group/res combo should exist but can't find it
@@ -353,7 +361,6 @@ class UserPermissions(dbhelpers.Db):
          if perms.get_status() != 0:
             return (4, 'bad_perm', perms.get_status())
          return perms
-
 
    #def modify_resource_rights(res_name):
    #   pass
