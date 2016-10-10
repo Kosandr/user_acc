@@ -1,9 +1,9 @@
-import sqlite3, atomicid, os.path
-from flask import Flask, request, send_from_directory
-import dbhelpers
+import sqlite3, os.path
+#from flask import Flask, request, send_from_directory
+from user_acc import dbhelpers, atomicid
 
-app = Flask(__name__)
-DB_PATH = '/tmp/permtest.db'
+#app = Flask(__name__)
+#DB_PATH = '/tmp/permtest.db'
 
 ######################Perm
 #perms are asrw, a being (a)dministrator privelages (can give out read/write), and s is (s)uper admin which can give out admin and superadmin
@@ -121,13 +121,6 @@ class Perm(object):
       return (self.val & Perm.ADMIN) is not 0
    def has_super_admin(self):
       return (self.val & Perm.SUPER) is not 0
-
-'''
-x = Perm([Perm.ADMIN, Perm.SUPER])
-x = Perm('asrw')
-x = Perm(Perm.ADMIN)
-y = Perm(x)
-'''
 
 #users and groups need to be unique
 class UserPermissions(dbhelpers.Db):
@@ -370,48 +363,8 @@ class UserPermissions(dbhelpers.Db):
       pass
 
 
-'''UserPermissions example
-from perm import UserPermissions
-p = UserPermissions('/sec/db/dbtnext/usertest.db')
 
-p.new_group('viewer')
-p.new_group('writer')
-p.new_group('privaleged_viewer')
-p.new_group('privaleged_modifier')
-p.new_group('admin')
-
-#main user
-p.new_user('root')
-p.new_group('root')
-p.add_user_to_group('root', 'root')
-p.add_user_to_group('admin', 'root')
-
-#approve section
-p.new_resource('approve_section')
-p.resource_group_add_perms('approve_section', 'root', 'ws') #'ws'
-p.resource_group_rm_perms('approve_section', 'admin', 'rw') #'rws'
-p.resource_group_rm_perms('approve_section', 'admin', 'wa', True) #resets, so 'wa' and no 's' or 'r'
-
-p.get_resource_group_perms('approve_section', 'root')
-
-#@requires_group('admin')
-@p.resource_name('approve_section')
-def approve_user(uname):
-   pass
-
-#@requires_group('admin')
-@p.resource_name('modify_user_group')
-def add_user_to_group(uname, grp):
-   pass
-
-@p.resource_name('report')
-def get_report(reportname):
-   pass
-
-#def view_report():
-#   pass
 '''
-
 n = 0
 class FormDb:
    def __init__(self):
@@ -426,8 +379,7 @@ class FormDb:
          self.init_db()
 
    def init_db(self):
-      self.c.execute('''CREATE TABLE contact_form
-                        (first_name text)''')
+      self.c.execute('CREATE TABLE contact_form (first_name text)')
       self.conn.commit()
 
    def add_contact(self, first):
@@ -453,5 +405,5 @@ def on_req():
 def test_objid():
    for i in urange(0, 1000):
       l = i
-
+'''
 

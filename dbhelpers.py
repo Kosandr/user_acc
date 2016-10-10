@@ -1,9 +1,9 @@
 #from events import Event
 import os.path, sqlite3
-from atomicid import ObjId
-from dbdict import DbDict
+from user_acc.atomicid import ObjId
+from user_acc.dbdict import DbDict
 #from secpass import PasswordDb
-from secpassdb import PasswordDb
+from user_acc.secpassdb import PasswordDb
 
 def log(msg):
    print(msg)

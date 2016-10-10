@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from multiprocessing import Lock
-import sqlite3, secpass
+import sqlite3
+from user_acc import secpass
 #from pycloak.shellutils import file_exists
 from os.path import exists as rile_exists
 #from . import secpass
