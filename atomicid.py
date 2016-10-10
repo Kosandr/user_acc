@@ -26,14 +26,15 @@ class ObjId:
       lock.release()
 
    def get_id(self, need_lock=True):
+      need_lock = True
       if need_lock:
          lock.acquire()
       self.c.execute('''SELECT objindex FROM obj_ids''')
       ret = self.c.fetchone()[0]
       pair = (ret+1, ret)
-      self.c.execute('''UPDATE obj_ids SET objindex=? where objindex=?''', pair)
-      self.conn.commit()
       if need_lock:
          lock.release()
+      self.c.execute('''UPDATE obj_ids SET objindex=? where objindex=?''', pair)
+      self.conn.commit()
       return ret
 
