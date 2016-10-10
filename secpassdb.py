@@ -67,11 +67,12 @@ class PasswordDb:
       #if new_user is None:
       #   return 4
       #(phash, salt, prepend) = new_user
+      lock.release()
       args = (nextId, username, pass_hash.replace('"', '""'))
       cmd = 'INSERT INTO userdata VALUES (?, ?, ?)'
       self.c.execute(cmd, args)
       self.conn.commit()
-      lock.release()
+      #lock.release()
       return 0
 
    #0 = good password, 1 = username doesn't exist
