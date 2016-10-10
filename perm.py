@@ -205,7 +205,7 @@ class UserPermissions(dbhelpers.Db):
       self.conn.commit()
       return 1
 
-   #add_user_to_grop(self, groupname, uname)
+   #add_user_to_group(self, groupname, uname)
    #1 = success
    #2 = group doesn't exist
    #3 = user doesn't exist
@@ -232,7 +232,7 @@ class UserPermissions(dbhelpers.Db):
    #2 = group doesn't exist
    #3 = user doesn't exist
    #4 = user not in group
-   def rm_user_from_group(groupname, uname):
+   def rm_user_from_group(self, groupname, uname):
       gId = self._get_gid(groupname)
       if gId is None:
          return 2
@@ -249,6 +249,49 @@ class UserPermissions(dbhelpers.Db):
 
       self.c.execute('DELETE FROM perm_group_members WHERE objid = ?',  (objId, ))
       return 1
+
+   #get_group_name_from_id(gid): returns None or gid
+   def get_group_name_from_id(self, gid):
+      self.c.execute('SELECT name from perm_groups WHERE objid = ?', (gid, ))
+      ret = self.c.fetchone()
+      if ret is None:
+         return None
+      return ret[0]
+
+   #get_user_groups(uname)
+   #1 = success
+   #2 = user doesn't exist
+   #3 = get_user_group_ids returned bad type
+   #4 = couldn't get name of one of the group_id's
+   def get_user_groups(self, uname):
+      gIds = self.get_user_group_ids(uname)
+      if type(gIds) is int:
+         return gIds
+      if type(gIds) is not list:
+         return 3
+      ret = []
+      for gId in gIds:
+         gName = self.get_group_name_from_id(gId)
+         if gName is None:
+            print('bad gId:' + str(gId))
+            return 4
+         ret.append(gName)
+      return ret
+
+   #get_user_group_ids()
+   #1 = success
+   #2 = user doesn't exist
+   def get_user_group_ids(self, uname):
+      uId = self._get_uid(uname)
+      if uId is None:
+         return 2
+      self.c.execute('SELECT group_id from perm_group_members WHERE user_id = ?', (uId, ))
+      ret = []
+      while True:
+         gid = self.c.fetchone()
+         if gid is None:
+            return ret
+         ret.append(gid[0])
 
    def _get_rid(self, res_name):
       self.c.execute('SELECT objid FROM perm_resources WHERE name = ?', (res_name, ))
@@ -368,7 +411,6 @@ class UserPermissions(dbhelpers.Db):
    #decorator. Passes arg "allowed"
    def resource_name(name):
       pass
-
 
 
 '''
