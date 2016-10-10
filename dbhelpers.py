@@ -72,16 +72,16 @@ class Db(object):
    def dget(self, key, val):
       return self.dbdict.get(key)
 
-   def user_exists(self, uname):
+   def account_exists(self, uname):
       return self.accounts.check_if_user_exists(uname)
 
    #0 = success, 1 = username taken, 2 = bad username, 3 = bad password
-   def add_user(self, uname, passw):
+   def add_account(self, uname, passw):
       return self.accounts.db_add_user(uname, passw)
    #0 = good password, 1 = username doesn't exist
    #2 = username doesn't match, 3 = password doesn't match
    # 4 = other error
-   def check_user_match(self, uname, passw):
+   def check_account_match(self, uname, passw):
       return self.accounts.db_check_user(name, passw)
 
 
