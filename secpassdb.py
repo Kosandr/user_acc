@@ -10,8 +10,8 @@ lock = Lock()
 #TODO: serialize username and password
 
 class PasswordDb:
-   def __init__(self, db_path = 'passwords.db', create_new = False, get_next_id=None,
-                min_uname=6, min_pass=8):
+   def __init__(self, db_path = 'passwords.db', create_new = False,
+                get_next_id=None, min_uname=6, min_pass=8):
       self.conn = sqlite3.connect(db_path)
       self.c = self.conn.cursor()
       if get_next_id is None:
@@ -61,7 +61,7 @@ class PasswordDb:
       #   return 4
       #(phash, salt, prepend) = new_user
       args = (nextId, username, pass_hash.replace('"', '""'))
-      cmd = 'INSERT INTO userdata VALUES (?, ?)'
+      cmd = 'INSERT INTO userdata VALUES (?, ?, ?)'
       self.c.execute(cmd, args)
       self.conn.commit()
       lock.release()
