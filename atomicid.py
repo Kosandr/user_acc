@@ -4,10 +4,7 @@ import time, sqlite3, os.path
 lock = Lock()
 
 class ObjId:
-   def __init__(self, dbpath_or_conn):
-
-      need_init = False
-
+   def __init__(self, dbpath_or_conn, need_init = False):
       if type(dbpath_or_conn) is str:
          if not os.path.exists(dbpath):
             need_init = True
