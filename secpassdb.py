@@ -16,7 +16,7 @@ class PasswordDb:
       if type(dbpath_or_conn) is str:
          if not os.path.exists(dbpath_or_conn):
             create_new = True
-         self.conn = sqlite3.connect(dbpath_or_conn)
+         self.conn = sqlite3.connect(dbpath_or_conn, check_same_thread=False)
       else:
          self.conn = dbpath_or_conn
 
@@ -58,7 +58,7 @@ class PasswordDb:
       #kkkkkkk lock.acquire()
       does_exist = self.check_if_user_exists(username)
       if does_exist:
-         lock.release()
+         #kkkk might need this #lock.release()
          return 1
 
       nextId = self.get_next_id(need_lock=False)

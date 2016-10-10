@@ -139,6 +139,7 @@ class UserPermissions(dbhelpers.Db):
       #group with id group_id has permissions to resource with id resource_id. Perm described in beginning
       self.c.execute('''CREATE TABLE perm_resource_allowed_groups
                                      (objid integer, resource_id integer, group_id integer, perms integer)''')
+      self.conn.commit()
 
    def __init__(self, dbpath):
       #tname = 'perm'

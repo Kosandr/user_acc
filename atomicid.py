@@ -32,8 +32,8 @@ class ObjId:
       ret = self.c.fetchone()[0]
       pair = (ret+1, ret)
       self.c.execute('''UPDATE obj_ids SET objindex=? where objindex=?''', pair)
+      self.conn.commit()
       if need_lock:
          lock.release()
-      self.conn.commit()
       return ret
 
