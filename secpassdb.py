@@ -60,7 +60,7 @@ class PasswordDb:
          lock.release()
          return 1
 
-      nextId = self.get_next_id()
+      nextId = self.get_next_id(need_lock=False)
       pass_hash = secpass.gen_pass_hash(password)
       #sp = secpass.SecurePassword()
       #new_user = sp.set_pass(password)

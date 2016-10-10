@@ -71,8 +71,8 @@ class Db(object):
       self.accounts = PasswordDb(self.dbpath, True, self.get_obj_id)
 
    ###
-   def get_obj_id(self):
-      return self.objids.get_id()
+   def get_obj_id(self, need_lock=True):
+      return self.objids.get_id(need_lock)
 
    def dset(self, key, val):
       self.dbdict.set(key, val)
