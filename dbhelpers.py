@@ -23,11 +23,12 @@ class Db(object):
       self.conn = sqlite3.connect(dbpath)
       self.c = self.conn.cursor()
 
-      #self.tables_need_exist['obj_ids'] = self._init_obj_ids
       self.objids = ObjId(self.conn) #ObjId(self.dbpath)
+      self.accounts = PasswordDb(self.dbpath, False, self.get_obj_id)
 
       self.tables_need_exist['str_str'] = self._init_db_dict
-      self.tables_need_exist['userdata'] = self._init_userdata
+      #self.tables_need_exist['userdata'] = self._init_userdata
+      #self.tables_need_exist['obj_ids'] = self._init_obj_ids
       self.init_tables()
 
    def check_if_table_exists(self, tableName):
