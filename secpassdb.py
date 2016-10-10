@@ -10,9 +10,16 @@ lock = Lock()
 #TODO: serialize username and password
 
 class PasswordDb:
-   def __init__(self, db_path = 'passwords.db', create_new = False,
-                get_next_id=None, min_uname=6, min_pass=8):
-      self.conn = sqlite3.connect(db_path)
+   def __init__(self, dbpath_or_conn = 'passwords.db',
+                create_new = False, get_next_id=None,
+                min_uname=6, min_pass=8):
+      if type(dbpath_or_conn) is str:
+         if not os.path.exists(dbpath_or_conn):
+            create_new = True
+         self.conn = sqlite3.connect(dbpath_or_conn)
+      else:
+         self.conn = dbpath_or_conn
+
       self.c = self.conn.cursor()
       if get_next_id is None:
          get_next_id = lambda: 0
