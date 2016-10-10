@@ -168,7 +168,7 @@ class UserPermissions(dbhelpers.Db):
          return 3
       if self._get_uid(uname) is not None:
          return 2
-      oid = self.get_obj_id()
+      oid = self.get_obj_id(False)
       self.c.execute('INSERT INTO perm_users VALUES (?, ?)', (oid, uname))
       self.conn.commit()
       return 1
@@ -250,6 +250,7 @@ class UserPermissions(dbhelpers.Db):
       objId = objId[0]
 
       self.c.execute('DELETE FROM perm_group_members WHERE objid = ?',  (objId, ))
+      self.conn.commit()
       return 1
 
    #get_group_name_from_id(gid): returns None or gid
@@ -328,6 +329,7 @@ class UserPermissions(dbhelpers.Db):
          return 2
       rid = self.get_obj_id()
       self.c.execute('INSERT INTO perm_resources VALUES (?, ?)', (rid, res_name))
+      self.conn.commit()
 
       #for group in groups:
       #   ret = self.perm_resource_add_group(group)
