@@ -293,7 +293,7 @@ class UserPermissions(dbhelpers.Db):
    #2 = res_name resource doesn't exist, 3 = group_name doesn't exist
    #4 = (4, 'bad_perm', perm_init_status) #whenever perms passed are invalid
    #5 = record for this group/resource combo should exist, but can't find it
-   def resource_group_add_perms(self, res_name, group_name, perms):
+   def resource_group_add_perms(self, res_name, group_name, perms, remove_old=False):
       #rid = self._get_rid(rid,) #kkyy
       rid = self._get_rid(res_name)
       if rid is None:
@@ -312,13 +312,14 @@ class UserPermissions(dbhelpers.Db):
          arg_tuple = (pid, rid, gid, real_perm.val)
          self.c.execute('INSERT INTO perm_resource_allowed_groups VALUES (?, ?, ?, ?)', arg_tuple)
       else:
-         self.c.execute('SELECT perms FROM perm_resource_allowed_groups WHERE objid = ?',
-                                (pid_old_entry, ))
-         perms = self.c.fetchone()
-         if perms is None or ((type(perms) is tuple) and  perms[0] is None):
-            return 5
-         old_perms = Perm(int(perms[0]))
-         real_perm = Perm(real_perm.val | old_perms.val)
+         if not remove_old:
+            self.c.execute('SELECT perms FROM perm_resource_allowed_groups WHERE objid = ?',
+                                   (pid_old_entry, ))
+            perms = self.c.fetchone()
+            if perms is None or ((type(perms) is tuple) and  perms[0] is None):
+               return 5
+            old_perms = Perm(int(perms[0]))
+            real_perm = Perm(real_perm.val | old_perms.val)
 
          self.c.execute('DELETE FROM perm_resource_allowed_groups WHERE objid = ?',
                         (pid_old_entry, ))
@@ -334,6 +335,32 @@ class UserPermissions(dbhelpers.Db):
 
    def resource_group_drop_all_perms(self, perm_id): #resource_group_rm_all_perms()
       pass
+
+   #1 = success, 2 = res_name doesn't exist, 3 = group_name doesn't exist
+   #4 = (4, 'bad_perm', perm_init_status)
+   #5 = record for this group/res combo should exist but can't find it
+   def get_resource_group_perms(self, res_name, group_name):
+      rid = self._get_rid(res_name)
+      if rid is None:
+         return 2
+      gid = self._get_gid(group_name)
+      if gid is None:
+         return 3
+
+      pid = self._get_permid_by_ids(rid, gid)
+      if pid is None:
+         return Perm(0)
+      else:
+         self.c.execute('SELECT perms FROM perm_resource_allowed_groups WHERE objid = ?',
+                                (pid, ))
+         perms = self.c.fetchone()
+         if perms is None or ((type(perms) is tuple) and  perms[0] is None):
+            return 5
+         perms = Perm(int(perms[0]))
+         if perms.get_status() != 0:
+            return (4, 'bad_perm', perms.get_status())
+         return perms
+
 
    #def modify_resource_rights(res_name):
    #   pass
@@ -361,9 +388,11 @@ p.add_user_to_group('admin', 'root')
 
 #approve section
 p.new_resource('approve_section')
-p.resource_group_add_perms('approve_section', 'root', 'rws')
-p.resource_group_rm_perms('approve_section', 'admin', 'rwa')
+p.resource_group_add_perms('approve_section', 'root', 'ws') #'ws'
+p.resource_group_rm_perms('approve_section', 'admin', 'rw') #'rws'
+p.resource_group_rm_perms('approve_section', 'admin', 'wa', True) #resets, so 'wa' and no 's' or 'r'
 
+p.get_resource_group_perms('approve_section', 'root')
 
 #@requires_group('admin')
 @p.resource_name('approve_section')
