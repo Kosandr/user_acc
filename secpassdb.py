@@ -3,7 +3,7 @@ from multiprocessing import Lock
 import sqlite3
 from user_acc import secpass
 #from pycloak.shellutils import file_exists
-from os.path import exists as rile_exists
+from os.path import exists as file_exists
 #from . import secpass
 
 lock = Lock()
@@ -14,7 +14,7 @@ class PasswordDb:
                 create_new = False, get_next_id=None,
                 min_uname=6, min_pass=8):
       if type(dbpath_or_conn) is str:
-         if not os.path.exists(dbpath_or_conn):
+         if not file_exists(dbpath_or_conn):
             create_new = True
          self.conn = sqlite3.connect(dbpath_or_conn, check_same_thread=False)
       else:

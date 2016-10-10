@@ -20,17 +20,15 @@ class Db(object):
       #   self.need_init_all = True
       #   log('need to initialize all tables')
 
-      self.conn = sqlite3.connect(dbpath)
+      self.conn = sqlite3.connect(dbpath, check_same_thread=False)
       self.c = self.conn.cursor()
 
       accounts_exist = self.check_if_table_exists('userdata')
       #self.accounts = PasswordDb(self.dbpath, not accounts_exist, self.get_obj_id)
       self.accounts = PasswordDb(self.conn, not accounts_exist, self.get_obj_id)
 
-      if self.check_if_table_exists('obj_ids') is False:
-         self.objids = ObjId(self.conn,  True)
-      else:
-         self.objids = ObjId(self.conn, False) #ObjId(self.dbpath)
+      #self.objids = ObjId(self.dbpath, not self.check_if_table_exists('obj_ids'))
+      self.objids = ObjId(self.conn, not self.check_if_table_exists('obj_ids'))
 
       self.tables_need_exist['str_str'] = self._init_db_dict
       #self.tables_need_exist['userdata'] = self._init_userdata
