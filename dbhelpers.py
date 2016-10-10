@@ -24,7 +24,7 @@ class Db(object):
       self.c = self.conn.cursor()
 
       #self.tables_need_exist['obj_ids'] = self._init_obj_ids
-      self.objids = ObjId(self.dbpath)
+      self.objids = ObjId(self.conn) #ObjId(self.dbpath)
 
       self.tables_need_exist['str_str'] = self._init_db_dict
       self.tables_need_exist['userdata'] = self._init_userdata
