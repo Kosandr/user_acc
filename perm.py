@@ -401,7 +401,7 @@ class UserPermissions(dbhelpers.Db):
          return Perm(0)
       else:
          self.c.execute('SELECT perms FROM perm_resource_allowed_groups WHERE objid = ?',
-                                (pid, ))
+                        (pid, ))
          perms = self.c.fetchone()
          if perms is None or ((type(perms) is tuple) and  perms[0] is None):
             return 5
@@ -410,10 +410,12 @@ class UserPermissions(dbhelpers.Db):
             return (4, 'bad_perm', perms.get_status())
          return perms
 
-   #get_resource_user_perms()
+   #get_resource_user_perms() => Perm()
    #2 = res_name doesn't exist
    #3 = user doesn't exist
-   #4 = (4, 'groups_fail', groups_ret_status) = get_user_groups() failed
+   #4 = (4, user_name, ret_status) = get_user_groups() failed
+   #5 = (5, group_name, res_name, ret_status) = get_resource_group_perms failed
+   #6 = (6, Perm().get_status()) = failed constructing one perm from all group perms put together
    def get_resource_user_perms(self, res_name, uname):
       rid = self._get_rid(res_name)
       if rid is None:
@@ -424,7 +426,24 @@ class UserPermissions(dbhelpers.Db):
 
       groups = self.get_user_groups(uname)
       if type(groups) is not list:
-         return (4, 'group_fail', groups)
+         return (4, uname, groups)
+
+      all_perms_num = 0
+      for group_name in groups:
+         perms_ret = self.get_resource_group_perms(res_name, group_name)
+         #if type(perms_ret) is not list:
+         #   return (5, group_name, res_name, perms_ret)
+         #for perm in perms_ret:
+         #   all_perms_num |= perm.val
+         if type(perms_ret) is not Perm:
+            return (5, group_name, res_name, perms_ret)
+         all_perms_num |= perms_ret.val
+
+      all_perms = Perm(all_perms_num)
+      perm_status = all_perms.get_status()
+      if perm_status != 0:
+         return (6, perm_status)
+      return all_perms
 
    #def modify_resource_rights(res_name):
    #   pass
