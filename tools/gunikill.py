@@ -63,7 +63,7 @@ def main():
          i += 1
       pad.refresh(0, 0, 1, 1, 65, 35)
 
-   draw_server_list(pad1, ['hello          ', 'world          '])
+   draw_server_list(pad1, ['hello', 'world'])
 
    x = pad_top.getkey()
    if x == 'x':
