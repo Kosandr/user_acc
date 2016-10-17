@@ -12,29 +12,38 @@ def init_curses():
    scr.keypad(True)
    curses.start_color()
 
-def shutdown():
+def shutdown(end_win=True):
+   global scr
    curses.nocbreak()
    scr.keypad(False)
    curses.echo()
-   curses.endwin()
+   if end_win:
+      curses.endwin()
 
 def curses_try(f, *args, **kwargs):
    try:
       f(*args, **kwargs)
-   except e:
-      print(e)
+   except Exception as e:
+      shutdown(False)
+      scr.addstr(0, 0, "Error occured:" + str(e))
+      scr.getch()
       shutdown()
+
+
+SERVER_LST_HEIGHT = 55
+SERVER_LST_WIDTH = 30
 
 def main():
    curses_try(init_curses)
    #scr.border(1)
+   #fdsf uncomment to test error recovery
 
    pad_top = curses.newpad(3, 80)
    pad_top.border(0)
    pad_top.refresh(0, 0, 1, 1, 3, 90)
 
    #vertical
-   pad1 = curses.newpad(55, 30)
+   pad1 = curses.newpad(SERVER_LST_HEIGHT, SERVER_LST_WIDTH)
    pad1.border(0)
 
    #horizontal
@@ -43,8 +52,14 @@ def main():
 
    def draw_server_list(pad, lst):
       i = 1
-      for x in lst:
-         pad.addstr(i, 1, x, curses.A_STANDOUT)
+      for serv_name in lst:
+         empty_left = SERVER_LST_WIDTH - len(serv_name)
+         extra_str = ''
+         for x in range(2, empty_left):
+            extra_str += ' '
+         serv_name += extra_str
+
+         pad.addstr(i, 1, serv_name, curses.A_STANDOUT)
          i += 1
       pad.refresh(0, 0, 1, 1, 65, 35)
 
