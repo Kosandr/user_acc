@@ -1,4 +1,4 @@
-import sqlite3, os.path
+import sqlite3, os.path, json
 #from flask import Flask, request, send_from_directory
 from user_acc import dbhelpers, atomicid
 
@@ -252,6 +252,14 @@ class UserPermissions(dbhelpers.Db):
       self.conn.commit()
       return 1
 
+   #get_user_name_from_id(uid) => uname or None
+   def get_user_name_from_id(self, uid):
+      self.c.execute('SELECT name from perm_users WHERE objid = ?', (uid, ))
+      ret = self.c.fetchone()
+      if ret is None:
+         return None
+      return ret[0]
+
    #get_group_name_from_id(gid): returns None or gid
    def get_group_name_from_id(self, gid):
       self.c.execute('SELECT name from perm_groups WHERE objid = ?', (gid, ))
@@ -261,8 +269,8 @@ class UserPermissions(dbhelpers.Db):
       return ret[0]
 
    #get_user_groups(uname)
-   #(wrong) 1 = success
-   #list = success
+   #wrong false: 1 = success
+   #true: list = success
    #2 = user doesn't exist
    #3 = get_user_group_ids returned bad type
    #4 = couldn't get name of one of the group_id's
@@ -385,7 +393,7 @@ class UserPermissions(dbhelpers.Db):
       pass
 
    #get_resource_group_perms(self, res_name, group_name)
-   #1 = success, 2 = res_name doesn't exist, 3 = group_name doesn't exist
+   #(1, Perm) = success, 2 = res_name doesn't exist, 3 = group_name doesn't exist
    #4 = (4, 'bad_perm', perm_init_status)
    #5 = record for this group/res combo should exist but can't find it
    def get_resource_group_perms(self, res_name, group_name):
@@ -410,7 +418,8 @@ class UserPermissions(dbhelpers.Db):
             return (4, 'bad_perm', perms.get_status())
          return perms
 
-   #get_resource_user_perms() => Perm()
+   #get_resource_user_perms(resname, uname) => Perm()
+   #1 = (1, perm) = good perm
    #2 = res_name doesn't exist
    #3 = user doesn't exist
    #4 = (4, user_name, ret_status) = get_user_groups() failed
@@ -443,8 +452,9 @@ class UserPermissions(dbhelpers.Db):
       perm_status = all_perms.get_status()
       if perm_status != 0:
          return (6, perm_status)
-      return all_perms
+      return (1, all_perms)
 
+   #TODO
    #def modify_resource_rights(res_name):
    #   pass
 
@@ -452,6 +462,53 @@ class UserPermissions(dbhelpers.Db):
    def resource_name(name):
       pass
 
+   #get_user_list() => [str]
+   def get_user_list(self):
+      self.c.execute('SELECT name FROM perm_users')
+      ret = []
+      while True:
+         uname = self.c.fetchone()
+         if uname is None:
+            break
+         ret.append(uname[0])
+      return ret
+
+   def fetch_list(self):
+      ret = []
+      while True:
+         x = self.c.fetchone()
+         if x is None:
+            break
+         ret.append(x[0])
+      return ret
+
+   #get_group_members(self, group_name)
+   #[] = list success
+   #1  = bad gname
+   ###############false bad info ######2  = (2, bad_user_id)
+   def get_group_members(self, group_name):
+      gid = self._get_gid(group_name)
+      if gid is None:
+         return 1
+      self.c.execute('SELECT user_id FROM perm_group_members WHERE group_id = ?', (gid, ))
+      users_id_lst = self.fetch_list()
+      ret = []
+      for user_id in users_id_lst:
+         uname = self.get_user_name_from_id(user_id)
+         if uname is None:
+            break
+         ret.append(uname)
+      return ret
+
+   def get_group_list(self): # => [str]
+      self.c.execute('SELECT name FROM perm_groups')
+      ret = []
+      while True:
+         uname = self.c.fetchone()
+         if uname is None:
+            break
+         ret.append(uname[0])
+      return ret
 
 '''
 n = 0
