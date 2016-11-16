@@ -1,0 +1,32 @@
+every time field gets filled out, can automatically save. Every user action, we could save form/inputs in chronological history with timestamp. Undo/Redo
+
+new resource:
+
+
+user_profile
+
+admin_panel
+   rwxa
+
+
+python parse output for gunicorn/flask
+   exception during event
+      Traceback (most recent call last):
+   exception in init
+      gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+
+
+admin panel
+   Dockerize
+   email/text alerts integration
+   chat app
+   app system like erpnext
+   error/exception
+   mobile-friendly
+   request rate limiter
+   change password
+   email verification
+   production
+
+
+rewriting backup scripts to identify drives with built-in named !!!!!!!!!
