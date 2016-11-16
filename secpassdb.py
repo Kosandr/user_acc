@@ -78,8 +78,8 @@ class PasswordDb:
       return 0
 
    #0 = good password, 1 = username doesn't exist
-   #2 = username doesn't match, 3 = password doesn't match
-   # 4 = other error
+   #2 = username doesn't match (internal)
+   #3 = password doesn't match, 4 = other error
    def db_check_user(self, username_check, password_check):
       user_exists = self.check_if_user_exists(username_check)
       if not user_exists:

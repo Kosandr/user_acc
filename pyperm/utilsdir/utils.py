@@ -115,7 +115,7 @@ def enum_helper(enum_list, enum_arg, to_index=None):
       elif type(enum_arg) is int:
          to_index = False
       else:
-         raise "Bad type passed to surveydb.utils.enum_helper(%s)" % (str(enum_arg))
+         raise "Bad type passed to utils.enum_helper(%s)" % (str(enum_arg))
 
    try:
       if to_index:

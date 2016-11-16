@@ -84,8 +84,8 @@ class Db(object):
    def add_account(self, uname, passw):
       return self.accounts.db_add_user(uname, passw)
    #0 = good password, 1 = username doesn't exist
-   #2 = username doesn't match, 3 = password doesn't match
-   # 4 = other error
+   #2 = username doesn't match (internal check)
+   #3 = password doesn't match, 4 = other error
    def check_account_match(self, uname, passw):
       return self.accounts.db_check_user(uname, passw)
 
