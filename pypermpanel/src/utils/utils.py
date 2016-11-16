@@ -5,30 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import ForeignKey
 import datetime
 
-_boolc = Column(Boolean)
-_intc = Column(Integer)
-_floatc = Column(Float)
-_idc = Column(Integer, primary_key=True)
-_textc = Column(Text)
-_datetimec = Column(DateTime)
-
-def idc():
-   return Column(Integer, primary_key=True) #_idc
-def boolc():
-   return Column(Boolean) #_boolc
-def intc():
-   return Column(Integer) #_intc
-def floatc():
-   return Column(Float) #_floatc
-def textc():
-   return Column(Text) #_textc
-def stringc(length=None):
-   return Column(String(length=length))
-def datetimec():
-   return Column(DateTime) #_datetimec
-def foreignidc(key):
-   return Column(Integer, ForeignKey(key))
-
 class Maybe:
    def __init__(self, val, err_code=None):
       self.val = val
@@ -53,7 +29,6 @@ class Maybe:
       ret += '>'
       return ret
 
-
 class AlchemyConfig:
    def __init__(self, eng = None, session = None, Session = None, debug = False):
       self.eng = eng
@@ -73,9 +48,10 @@ class AlchemyConfig:
    def from_eng_sesh(eng, sesh, debug=False):
       return AlchemyConfig(eng, sesh, debug=debug)
 
-   def from_creds(uname, passw, db_name, db_backend='mysql', debug = False):
-      engine_path_args = (db_backend, uname, passw, db_name)
-      engine_path = '%s://%s:%s@localhost/%s' % engine_path_args
+   def from_creds(uname, passw, db_name, db_backend='mysql',
+                  host='localhost', debug = False):
+      engine_path_args = (db_backend, uname, passw, host, db_name)
+      engine_path = '%s://%s:%s@%s/%s' % engine_path_args
       return AlchemyConfig.from_engine_path(engine_path)
 
    #first line uname, second line password
@@ -83,6 +59,7 @@ class AlchemyConfig:
       user, passw = AlchemyConfig.get_mariadb_creds(creds_path)
       return AlchemyConfig.from_creds(user, passw, db_name, debug = debug)
 
+   #TODO: change this to generic from_creds args, possibly python conf format
    def get_mariadb_creds(creds_path):
       user = None
       passw = None
@@ -137,5 +114,30 @@ def unix_to_datetime(x):
 
 def datetime_to_str(d):
    return d.strftime('%Y-%m-%d %H:%M:%S')
+
+
+_boolc = Column(Boolean)
+_intc = Column(Integer)
+_floatc = Column(Float)
+_idc = Column(Integer, primary_key=True)
+_textc = Column(Text)
+_datetimec = Column(DateTime)
+
+def idc():
+   return Column(Integer, primary_key=True) #_idc
+def boolc():
+   return Column(Boolean) #_boolc
+def intc():
+   return Column(Integer) #_intc
+def floatc():
+   return Column(Float) #_floatc
+def textc():
+   return Column(Text) #_textc
+def stringc(length=None):
+   return Column(String(length=length))
+def datetimec():
+   return Column(DateTime) #_datetimec
+def foreignidc(key):
+   return Column(Integer, ForeignKey(key))
 
 
