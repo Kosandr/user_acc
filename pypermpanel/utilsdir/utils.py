@@ -62,11 +62,12 @@ class AlchemyConfig:
       self.debug = debug
 
    def from_engine_path(engine_path, debug=False, pool_recycle=None):
-      eng = create_engine(engine_path, echo=debug)
+      if pool_recycle is None:
+         pool_recycle = 3600
+      eng = create_engine(engine_path, echo=debug, pool_recycle=pool_recycle)
       Session = sessionmaker(bind=eng)
       session = Session()
 
-      pool_recycle = 3600
       return AlchemyConfig(eng, session, Session, debug=debug)
 
    def from_eng_sesh(eng, sesh, debug=False):
