@@ -149,7 +149,7 @@ docker tag <contId> <uname/imgName:tag>
    docker tag 5db5f7471261 ouruser/sinatra:devel
 ```
 
-===== Simple way to make images
+##### Simple way to make images
 ```bash
 
 docker commit [-m "Commit Msg"] [-a "Author Name"] <IMAGE_ID> <USERNAME/REPONAME:TAG>
@@ -162,7 +162,7 @@ docker commit [-m "Commit Msg"] [-a "Author Name"] <IMAGE_ID> <USERNAME/REPONAME
    run custom image
       docker run -t -i ouruser/sinatra:v2 /bin/bash
 ```
-===== Dockerfile images
+##### Dockerfile images
 ```bash
 docker build [-t uname/imgname:tag] . = builds new image
    -t specifies user for image
@@ -223,3 +223,4 @@ creating custom network and using it:
 Data volumes
 
 
+```
