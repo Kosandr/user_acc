@@ -11,7 +11,6 @@ python deps:
    pip binding for sqlite3
 
 sudo npm install -g browserify
-
 #############
 
 #sass
