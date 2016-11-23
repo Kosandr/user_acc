@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 MAINTAINER Konstantin Kowalski <kostelkow@gmail.com>
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y nginx python3 redis-server
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y nginx python3 redis-server git
 
 #Mariadb
 #password issue: http://dba.stackexchange.com/questions/35866/install-mariadb-without-password-prompt-in-ubuntu

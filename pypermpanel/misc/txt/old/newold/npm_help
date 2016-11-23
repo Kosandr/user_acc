@@ -1,0 +1,9 @@
+=========old chunk deleteme
+
+development monitors are separate container
+db separate container
+
+curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+
