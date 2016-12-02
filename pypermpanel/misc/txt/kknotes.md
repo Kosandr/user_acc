@@ -18,6 +18,11 @@ apt-get update```
 
 http://stackoverflow.com/questions/37227349/unable-to-start-docker-service-in-ubuntu-16-04/37640824#37640824
 
+good tutorials
+   haven't done yet:
+      https://docs.docker.com/engine/userguide/intro/
+   !!! Learn by example (tutorial from which notes are based)
+      https://docs.docker.com/engine/tutorials/dockerizing/
 
 ### Docker notes
 

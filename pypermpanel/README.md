@@ -33,6 +33,7 @@ docker run -it rastapasta42/py-flask-react-sass-sqlalchemy
       - [ ] credential access
          - [ ] isolate each credential file
          - [ ] use single file instead of volumes
+- [ ] app package manager/store
 - [ ] various branches for development and production use
 - [ ] SQLAlchemy user storage and permission system (src/pyperm.py)
 - [ ] generic apps on each desktop/site, and can have multiple desktops
