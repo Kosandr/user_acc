@@ -28,6 +28,7 @@ nmpfrsa = Nginx/Mariadb/Python/Flask/React/Sass/sqlAlchemy
    - main backend server = central access point for the site, puts everything together
       - run nginx server, gunicorn
       - has ro (read-only) access to backend code volume
+      - maybe separate this out into seprate containers for gunicorn and nginx (see TODO)
    - database = runs MariaDB
       - has rw access to db volume
    - watchers = compiles jsx and sass files, re-starts server when needed
@@ -50,6 +51,5 @@ TODO:
    - each app can have it's own volume (or not)
       - 1 for code, and possibly second one separate volume for private db
       - for apps maybe don't need a volume and do git clone when creating image or something
-
-
+   - maybe separate backend into 2 containers, one for gunicorn and another nginx
 
