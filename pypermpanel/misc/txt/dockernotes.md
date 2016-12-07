@@ -231,14 +231,14 @@ docker run -v [<HostVolumeLocation>:]<ContainerVolumeMountPoint>[:ro]
       -v volumeName:/blah = mounts to named volume stored by docker
       -v volumeName/webapp:ro = read only docker volume
       -v /host/path:/webapp = mount to host path (needs to be absolute)
-      -v run --rm -it -v ~/.bash_hostiry:/root/.bash_history ubuntu /bin/bash
+      -v run --rm -it -v ~/.bash_history:/root/.bash_history ubuntu /bin/bash
          mount single file
    ex:
       docker run -d -P --name web -v /webapp ubuntu /bin/echo hello
    host directory mounting
       -v /host/path:/webapp = cannot mount host form Dockerfile
    inspecting volumes
-      docker inspect web = prints json: "Mounts": [ ...
+      docker inspect web = prints json: "Mounts": [ ... ]
    - stores actual data for anonymous volumes at /var/lib/docker/volumes
 
 docker volume ls [-f dangling=true]

@@ -10,7 +10,7 @@ nmpfrsa = Nginx/Mariadb/Python/Flask/React/Sass/sqlAlchemy
 ##nmpfrsa
 
 - Overview
-   - separated into 5 volumes and at least 5 containers
+   - separated into 5 volumes and at least 4 containers
       - volumes: database, assets, backend code (py/js/sass source code), and assets
       - containers: main backend server, db, watchers, development
    - sites and apps
