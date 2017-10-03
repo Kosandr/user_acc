@@ -1,4 +1,9 @@
 
+import sys
+sys.path.append('/root/orgs/Kosandr')
+
+import user_acc
+
 
 route_args = {
    'strict_slashes' : False,
@@ -12,4 +17,6 @@ def init_lib(app):
    def robots():
       #render_template('robots.txt')
 	return '''User-agent: *\nDisallow:'''
+
+
 

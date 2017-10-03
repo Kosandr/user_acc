@@ -2,6 +2,10 @@ from .perm import Perm
 from .perm import UserPermissions
 from . import atomicid
 
+
+from . import secpassdb
+
+
 '''Perm example
 x = Perm([Perm.ADMIN, Perm.SUPER])
 x = Perm('asrw')
@@ -55,3 +59,10 @@ def get_report(reportname):
 #   pass
 '''
 
+
+
+'''secpassdb example'''
+
+
+
+'''

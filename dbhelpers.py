@@ -1,9 +1,9 @@
 #from events import Event
 import os.path, sqlite3
-from user_acc.atomicid import ObjId
-from user_acc.dbdict import DbDict
+from .atomicid import ObjId
+from .dbdict import DbDict
 #from secpass import PasswordDb
-from user_acc.secpassdb import PasswordDb
+from .secpassdb import PasswordDb
 
 def log(msg):
    print(msg)
@@ -89,4 +89,5 @@ class Db(object):
    def check_account_match(self, uname, passw):
       return self.accounts.db_check_user(uname, passw)
 
+   #pass
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from multiprocessing import Lock
 import sqlite3
-from user_acc import secpass
+from . import secpass
 #from pycloak.shellutils import file_exists
 from os.path import exists as file_exists
 #from . import secpass
@@ -10,9 +10,16 @@ lock = Lock()
 #TODO: serialize username and password
 
 class PasswordDb:
+   '''PaswordDB'''
+
    def __init__(self, dbpath_or_conn = 'passwords.db',
                 create_new = False, get_next_id=None,
                 min_uname=6, min_pass=8):
+      """Init function
+
+      Args:
+         dbpath_or_conn: database path
+      """
       if type(dbpath_or_conn) is str:
          if not file_exists(dbpath_or_conn):
             create_new = True
@@ -37,6 +44,10 @@ class PasswordDb:
       self.conn.commit()
 
    def check_if_user_exists(self, uname):
+      """Checks if user exists
+
+      Tests
+      """
       self.c.execute("SELECT username FROM userdata WHERE username = ?", (uname, ))
       if self.c.fetchone() != None:
          return True
@@ -102,6 +113,7 @@ class PasswordDb:
       if secpass.check_pass_match(password_check, phash):
          return 0
       return 3
+
 
 
 #TESTS

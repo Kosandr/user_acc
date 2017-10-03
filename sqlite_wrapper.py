@@ -2,7 +2,16 @@ import sqlite3, json
 import uuid
 
 class Db:
+   '''Database Helper Class'''
+
    def __init__(self, path, table_name): #path = 'test.db'
+      '''
+
+      Args:
+         path: path to sqlite file
+         table_name: name for this table
+      '''
+
       self.conn = sqlite3.connect(path)
       self.table_name = table_name
 

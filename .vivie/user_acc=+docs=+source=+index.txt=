@@ -32,8 +32,8 @@ setlocal nodiff
 setlocal equalprg=
 setlocal errorformat=
 setlocal expandtab
-if &filetype != 'python'
-setlocal filetype=python
+if &filetype != 'rst'
+setlocal filetype=rst
 endif
 setlocal fixendofline
 setlocal foldcolumn=0
@@ -92,13 +92,13 @@ setlocal statusline=
 setlocal suffixesadd=
 setlocal swapfile
 setlocal synmaxcol=3000
-if &syntax != 'python'
-setlocal syntax=python
+if &syntax != 'rst'
+setlocal syntax=rst
 endif
 setlocal tabstop=6
 setlocal tagcase=
 setlocal tags=
-setlocal textwidth=150
+setlocal textwidth=50
 setlocal thesaurus=
 setlocal noundofile
 setlocal undolevels=-123456
@@ -107,11 +107,11 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 200 - ((0 * winheight(0) + 10) / 21)
+let s:l = 34 - ((33 * winheight(0) + 33) / 66)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-200
+34
 normal! 0
 let &so = s:so_save | let &siso = s:siso_save
 doautoall SessionLoadPost
