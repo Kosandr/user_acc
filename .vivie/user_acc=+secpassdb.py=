@@ -98,7 +98,7 @@ endif
 setlocal tabstop=6
 setlocal tagcase=
 setlocal tags=
-setlocal textwidth=50
+setlocal textwidth=190
 setlocal thesaurus=
 setlocal noundofile
 setlocal undolevels=-123456
@@ -115,13 +115,13 @@ silent! normal! zE
 12,116fold
 12
 normal! zo
-12
-normal! zc
-let s:l = 2 - ((1 * winheight(0) + 16) / 32)
+15
+normal! zo
+let s:l = 134 - ((78 * winheight(0) + 14) / 29)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-2
+134
 normal! 0
 let &so = s:so_save | let &siso = s:siso_save
 doautoall SessionLoadPost
